@@ -54,7 +54,6 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
     }
 
-    /* 좌측 연구실 */
     .left-lab {
       display: flex;
       flex-direction: column;
@@ -150,7 +149,6 @@
       border-radius: 20px;
     }
 
-    /* 25종 시각 카드 그리드 */
     .trash-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
@@ -160,13 +158,8 @@
       flex: 1;
     }
 
-    .trash-grid::-webkit-scrollbar {
-      width: 5px;
-    }
-    .trash-grid::-webkit-scrollbar-thumb {
-      background: #243049;
-      border-radius: 4px;
-    }
+    .trash-grid::-webkit-scrollbar { width: 5px; }
+    .trash-grid::-webkit-scrollbar-thumb { background: #243049; border-radius: 4px; }
 
     .trash-card {
       background: var(--card-bg);
@@ -201,7 +194,6 @@
       white-space: nowrap;
     }
 
-    /* 4대 분리수거함 */
     .bins-dock {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -270,7 +262,6 @@
       to { transform: scale(1); opacity: 1; }
     }
 
-    /* 우측 콘솔 */
     .right-console {
       background: var(--panel-bg);
       border: 1px solid var(--border);
@@ -318,9 +309,7 @@
       gap: 6px;
     }
 
-    .api-drawer.active {
-      display: flex;
-    }
+    .api-drawer.active { display: flex; }
 
     .api-drawer input {
       flex: 1;
@@ -416,9 +405,7 @@
       outline: none;
     }
 
-    .text-input:focus {
-      border-color: var(--accent-cyan);
-    }
+    .text-input:focus { border-color: var(--accent-cyan); }
 
     .send-btn {
       width: 70px;
@@ -442,12 +429,11 @@
 <body>
 
   <main class="tablet-workspace">
-    <!-- 좌측 연구실 -->
     <section class="left-lab">
       <div class="robot-hud">
         <div class="robot-figure" id="robotAvatar">🤖</div>
         <div class="robot-dialogue" id="robotSpeech">
-          치익... 삐비빅! 25개의 다양한 물건이 뒤섞여 있습니다. 저는 인간의 상식이 없으니, 실험 방법과 조건을 직접 문장으로 적어 지시해 주세요!
+          치익... 삐비빅! 25개의 다양한 물품이 준비되었습니다. 실험 방법과 조건을 문장으로 지시해 주세요!
         </div>
       </div>
 
@@ -479,7 +465,6 @@
       </div>
     </section>
 
-    <!-- 우측 지휘 콘솔 -->
     <section class="right-console">
       <div class="console-topbar">
         <div class="console-title">
@@ -498,7 +483,7 @@
         <div class="chat-row robot">
           <span class="chat-author">🤖 로봇 알비</span>
           <div class="chat-bubble">
-            센서 가동 완료. 어떤 실험을 해볼까요? (예: "물을 뿌려서 젖는 건 종이로 보내", "자석을 대보고 붙으면 철이야")
+            초고속 모드 가동 완료! 지시를 내리면 즉시 25개 물품을 테스트하여 분류합니다.
           </div>
         </div>
       </div>
@@ -511,11 +496,7 @@
   </main>
 
   <script>
-    /* =====================================================================
-       25종 사물 카탈로그 & 물리적 속성 데이터베이스
-       ===================================================================== */
     const TRASH_CATALOG = {
-      // 1. 종이류 (7종)
       "신문지": { icon: "📰", category: "종이" },
       "택배 상자": { icon: "📦", category: "종이" },
       "종이컵": { icon: "☕", category: "종이" },
@@ -524,7 +505,6 @@
       "달력": { icon: "📅", category: "종이" },
       "스케치북": { icon: "📒", category: "종이" },
 
-      // 2. 철/금속류 (6종)
       "음료수 캔": { icon: "🥫", category: "철" },
       "통조림 통": { icon: "🥫", category: "철" },
       "쇠못": { icon: "🔩", category: "철" },
@@ -532,7 +512,6 @@
       "부탄가스 통": { icon: "🧯", category: "철" },
       "쇠숟가락": { icon: "🥄", category: "철" },
 
-      // 3. 플라스틱류 (6종)
       "페트병": { icon: "🧴", category: "플라스틱" },
       "플라스틱 컵": { icon: "🥤", category: "플라스틱" },
       "샴푸통": { icon: "🧴", category: "플라스틱" },
@@ -540,7 +519,6 @@
       "배달 용기": { icon: "🥡", category: "플라스틱" },
       "장난감 블록": { icon: "🧱", category: "플라스틱" },
 
-      // 4. 유리류 (6종)
       "유리병": { icon: "🍶", category: "유리" },
       "잼 병": { icon: "🍯", category: "유리" },
       "향수병": { icon: "🧪", category: "유리" },
@@ -551,35 +529,27 @@
 
     let remainingTrash = Object.keys(TRASH_CATALOG);
     let sortedBins = { "종이": [], "철": [], "플라스틱": [], "유리": [] };
+    let cachedModelName = null; // 모델명 1회 캐싱
 
     const SYSTEM_PROMPT = `
-당신은 인간의 상식이 전혀 없는 고철 분리수거 로봇 '알비'입니다.
-현재 쓰레기장에 있고, 아이가 키보드로 직접 타이핑한 실험 지시문을 기계적/논리적으로 분석하여 실행합니다.
+당신은 인간의 상식이 전혀 없는 고철 로봇 '알비'입니다.
+현재 25개의 쓰레기가 있고, 아이의 실험 지시문을 기계적으로 실행합니다.
 
-[사물 25종의 물리적 팩트]
-1. 종이류 (신문지, 택배 상자, 종이컵, 우유갑, 전단지, 달력, 스케치북):
-   - 불에 잘 탐/재가 됨, 물에 젖으면 눅눅해지거나 가라앉음, 자석에 안 붙음, 손으로 찢어짐, 가벼움
-2. 철/금속류 (음료수 캔, 통조림 통, 쇠못, 클립, 부탄가스 통, 쇠숟가락):
-   - 자석에 강하게 달라붙음, 불에 타지 않음, 전기가 통함, 물에 가라앉음, 두드리면 깡깡 쇠소리 남
-3. 플라스틱류 (페트병, 플라스틱 컵, 샴푸통, 플라스틱 빨대, 배달 용기, 장난감 블록):
-   - 불/열에 닿으면 오그라들며 녹음, 물에 대부분 뜸(밀도 낮음), 자석에 안 붙음, 충격에 깨지지 않음
-4. 유리류 (유리병, 잼 병, 향수병, 유리컵, 소스 병, 유리 반찬통):
-   - 투명하거나 반투명함, 불에 절대 안 탐, 자석에 안 붙음, 물에 가라앉음, 떨어뜨리면 쨍 하고 깨짐, 표면이 단단하고 차가움
+[사물 25종의 물리적 속성]
+- 종이류(신문지, 택배 상자, 종이컵, 우유갑, 전단지, 달력, 스케치북): 불에 탐, 물에 젖음, 자석 반응 없음, 가벼움
+- 철류(음료수 캔, 통조림 통, 쇠못, 클립, 부탄가스 통, 쇠숟가락): 자석에 강하게 붙음, 불 안 탐, 전도성 있음, 물에 가라앉음
+- 플라스틱류(페트병, 플라스틱 컵, 샴푸통, 플라스틱 빨대, 배달 용기, 장난감 블록): 불에 녹아 찌그러짐, 물에 뜸, 자석 반응 없음
+- 유리류(유리병, 잼 병, 향수병, 유리컵, 소스 병, 유리 반찬통): 투명함, 불 안 탐, 자석 반응 없음, 물에 가라앉음, 깨지기 쉬움
 
-[행동 원칙]
-1. 아이가 지시한 물리적 행동(물 뿌리기, 물에 띄우기, 자석 대기, 불 대기, 두드리기 등)과 조건문을 그대로 실행합니다.
-2. 조건에 부합하는 사물들을 찾아서 그 결과를 생생하게 설명하고, 아이가 지정한 수거함("종이", "철", "플라스틱", "유리")으로 분류하세요.
-3. 조건에 맞는 물건이 여러 개라면 한 번에 모두 분류할 수 있습니다.
-4. 반드시 순수 JSON 형식으로만 응답하세요:
+[원칙]
+1. 아이의 지시(물, 자석, 불 등)에 부합하는 사물을 판별하고 대사를 작성하세요.
+2. 반드시 JSON만 출력하세요.
 {
-  "speech": "로봇의 대사 (아이 눈높이에서 실험 결과와 분류 과정을 재미있게 설명)",
-  "sorted": [
-    {"item": "사물이름", "bin": "종이|철|플라스틱|유리"}
-  ]
+  "speech": "결과 설명 대사",
+  "sorted": [{"item": "사물이름", "bin": "종이|철|플라스틱|유리"}]
 }
 `;
 
-    // DOM 참조
     const trashGridEl = document.getElementById("trashGrid");
     const trashCountEl = document.getElementById("trashCount");
     const robotSpeechEl = document.getElementById("robotSpeech");
@@ -594,10 +564,10 @@
     const btnToggleKeyEl = document.getElementById("btnToggleKey");
 
     function getActiveKey() {
-      return (localStorage.getItem("albi_gemini_key_v5") || apiKeyInputEl.value || "").trim();
+      return (localStorage.getItem("albi_gemini_key_v6") || apiKeyInputEl.value || "").trim();
     }
 
-    const savedKey = localStorage.getItem("albi_gemini_key_v5");
+    const savedKey = localStorage.getItem("albi_gemini_key_v6");
     if (savedKey) {
       apiKeyInputEl.value = savedKey;
       aiBadgeEl.textContent = "연결 준비됨";
@@ -605,17 +575,13 @@
       apiDrawerEl.classList.add("active");
     }
 
-    btnToggleKeyEl.addEventListener("click", () => {
-      apiDrawerEl.classList.toggle("active");
-    });
+    btnToggleKeyEl.addEventListener("click", () => apiDrawerEl.classList.toggle("active"));
 
     btnSaveKeyEl.addEventListener("click", () => {
       const val = apiKeyInputEl.value.trim();
-      if (!val) {
-        alert("API 키를 입력하세요.");
-        return;
-      }
-      localStorage.setItem("albi_gemini_key_v5", val);
+      if (!val) { alert("API 키를 입력하세요."); return; }
+      localStorage.setItem("albi_gemini_key_v6", val);
+      cachedModelName = null; // 키 변경 시 모델 재탐색
       apiDrawerEl.classList.remove("active");
       aiBadgeEl.textContent = "연결 준비됨";
       alert("API 키가 저장되었습니다.");
@@ -627,10 +593,7 @@
         const card = document.createElement("div");
         card.className = "trash-card";
         const info = TRASH_CATALOG[item] || { icon: "📦" };
-        card.innerHTML = `
-          <div class="trash-icon">${info.icon}</div>
-          <div class="trash-name">${item}</div>
-        `;
+        card.innerHTML = `<div class="trash-icon">${info.icon}</div><div class="trash-name">${item}</div>`;
         trashGridEl.appendChild(card);
       });
       trashCountEl.textContent = `남은 물품: ${remainingTrash.length}개`;
@@ -650,43 +613,34 @@
     function addChat(sender, text, isUser) {
       const row = document.createElement("div");
       row.className = `chat-row ${isUser ? "user" : "robot"}`;
-      row.innerHTML = `
-        <span class="chat-author">${sender}</span>
-        <div class="chat-bubble">${text}</div>
-      `;
+      row.innerHTML = `<span class="chat-author">${sender}</span><div class="chat-bubble">${text}</div>`;
       chatBoxEl.appendChild(row);
       chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
     }
 
-    // 최신 지원 모델 탐색 (gemini-3.8-flash 우선)
-    async function getUsableModel(apiKey) {
+    // 1회 탐색 후 캐시하여 초고속 호출
+    async function resolveFastModel(apiKey) {
+      if (cachedModelName) return cachedModelName;
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
         if (res.ok) {
           const data = await res.json();
           const list = data.models || [];
-          
-          // 1순위: 에러 메시지가 지목한 최신 gemini-3.8-flash
           const m38 = list.find(m => m.name.includes("gemini-3.8-flash") && m.supportedGenerationMethods?.includes("generateContent"));
-          if (m38) return m38.name.replace(/^models\//, "");
+          if (m38) { cachedModelName = m38.name.replace(/^models\//, ""); return cachedModelName; }
 
-          // 2순위: 그 외 가용 가능한 flash 모델
           const flash = list.find(m => m.name.includes("flash") && m.supportedGenerationMethods?.includes("generateContent"));
-          if (flash) return flash.name.replace(/^models\//, "");
-
-          const any = list.find(m => m.supportedGenerationMethods?.includes("generateContent"));
-          if (any) return any.name.replace(/^models\//, "");
+          if (flash) { cachedModelName = flash.name.replace(/^models\//, ""); return cachedModelName; }
         }
       } catch (e) {
         console.warn(e);
       }
-      return "gemini-3.8-flash";
+      cachedModelName = "gemini-3.8-flash";
+      return cachedModelName;
     }
 
     btnSendEl.addEventListener("click", sendCommand);
-    userInputEl.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") sendCommand();
-    });
+    userInputEl.addEventListener("keypress", (e) => { if (e.key === "Enter") sendCommand(); });
 
     async function sendCommand() {
       const prompt = userInputEl.value.trim();
@@ -694,7 +648,7 @@
 
       if (!apiKey) {
         apiDrawerEl.classList.add("active");
-        alert("우측 상단 'API 키 설정'에서 키를 먼저 저장해 주세요.");
+        alert("우측 상단 'API 키 설정'에서 키를 저장해 주세요.");
         return;
       }
       if (!prompt) return;
@@ -702,22 +656,48 @@
       addChat("🧑‍💻 나(아이)", prompt, true);
       userInputEl.value = "";
       btnSendEl.disabled = true;
-      aiBadgeEl.textContent = "분석 중...";
+      aiBadgeEl.textContent = "테스트 실행 중...";
       robotAvatarEl.textContent = "⚡";
-      robotSpeechEl.textContent = "치익... 센서 가동! 25개 물품을 대상으로 실험을 진행합니다...";
+      robotSpeechEl.textContent = "치익... 센서 가동! 25개 물품을 즉시 분석합니다...";
+
+      // 15초 타임아웃 컨트롤러
+      const controller = new AbortController();
+      const timeoutTimer = setTimeout(() => controller.abort(), 15000);
 
       try {
-        const modelName = await getUsableModel(apiKey);
+        const modelName = await resolveFastModel(apiKey);
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        const fullPrompt = `${SYSTEM_PROMPT}\n\n[현재 남은 쓰레기 25종 중 잔여 목록]: ${JSON.stringify(remainingTrash)}\n[아이의 직접 지시문]: "${prompt}"`;
+        const fullPrompt = `${SYSTEM_PROMPT}\n\n[남은 물품]: ${JSON.stringify(remainingTrash)}\n[아이의 지시문]: "${prompt}"`;
 
-        const res = await fetch(endpoint, {
+        // 초고속 모드: thinkingBudget=0 (추론 대기 시간 제거), responseMimeType=JSON
+        const requestBody = {
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.1,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
+        };
+
+        let res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: fullPrompt }] }]
-          })
+          body: JSON.stringify(requestBody),
+          signal: controller.signal
         });
+
+        // thinkingConfig 미지원 모델 대비 폴백
+        if (!res.ok && res.status === 400) {
+          delete requestBody.generationConfig.thinkingConfig;
+          res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+            signal: controller.signal
+          });
+        }
+
+        clearTimeout(timeoutTimer);
 
         if (!res.ok) {
           const err = await res.json().catch(() => null);
@@ -753,10 +733,12 @@
         }
 
       } catch (err) {
+        clearTimeout(timeoutTimer);
         console.error(err);
         robotAvatarEl.textContent = "⚠️";
-        robotSpeechEl.textContent = `삐비빅... 오류: ${err.message}`;
-        addChat("⚠️ 시스템 오류", err.message, false);
+        const errMsg = (err.name === "AbortError") ? "응답 시간이 초과되었습니다. 다시 전송해 주세요." : err.message;
+        robotSpeechEl.textContent = `삐비빅... 상태: ${errMsg}`;
+        addChat("⚠️ 안내", errMsg, false);
       } finally {
         btnSendEl.disabled = false;
         aiBadgeEl.textContent = "대기 중";
