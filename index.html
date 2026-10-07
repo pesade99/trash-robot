@@ -71,7 +71,6 @@
       color: var(--accent-blue);
     }
 
-    /* 안전한 키 입력 바 */
     .api-bar {
       background: #111827;
       border: 1px solid #3b82f6;
@@ -293,13 +292,11 @@
       <span class="status-badge" id="aiStatusBadge">준비 완료</span>
     </header>
 
-    <!-- API 키 설정 바 (브라우저에 보관) -->
     <div class="api-bar" id="apiBarContainer">
       <input type="password" id="apiKeyInput" placeholder="새로 발급받은 Gemini API 키 붙여넣기">
       <button id="btnSaveKey">저장</button>
     </div>
 
-    <!-- 로봇 캐릭터 & 말풍선 -->
     <div class="robot-stage">
       <div class="robot-avatar" id="robotAvatar">🤖</div>
       <div class="robot-speech" id="robotSpeech">
@@ -307,7 +304,6 @@
       </div>
     </div>
 
-    <!-- 쓰레기장 -->
     <div class="yard-box">
       <div class="yard-title">
         <span>뒤섞인 쓰레기 더미</span>
@@ -316,7 +312,6 @@
       <div class="trash-items" id="yardItems"></div>
     </div>
 
-    <!-- 분리수거함 -->
     <div class="bins-grid">
       <div class="bin-card paper">
         <span class="bin-name" style="color: var(--accent-blue);">종이</span>
@@ -336,7 +331,6 @@
       </div>
     </div>
 
-    <!-- 힌트 태그 -->
     <div class="hint-scroll">
       <span class="hint-chip" onclick="fillHint('자석을 대보고, 달라붙는 것은 철로 분류해')">🧲 자석 대보기</span>
       <span class="hint-chip" onclick="fillHint('물통에 띄워봐서, 물에 뜨면 플라스틱으로 분류해')">💧 물에 띄우기</span>
@@ -344,7 +338,6 @@
       <span class="hint-chip" onclick="fillHint('투명하면서 딱딱하고 두드렸을 때 챙 소리나면 유리야')">🔍 투명도 확인</span>
     </div>
 
-    <!-- 입력창 -->
     <div class="input-section">
       <input type="text" id="userInput" class="cmd-input" placeholder="로봇 알비에게 행동과 조건을 지시하세요" autocomplete="off">
       <button id="btnSend" class="btn-send">지시</button>
@@ -407,7 +400,7 @@
       }
       localStorage.setItem("albi_gemini_key_v2", val);
       aiStatusBadge.textContent = "키 등록됨";
-      alert("API 키가 저장되었습니다. 이제 아래 입력창으로 명령해 보세요!");
+      alert("API 키가 저장되었습니다.");
     });
 
     window.fillHint = function(text) {
@@ -437,12 +430,53 @@
       if (e.key === "Enter") executeInstruction();
     });
 
+    // 지원 가능한 엔드포인트 후보군 목록
+    const ENDPOINT_CANDIDATES = [
+      (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${k}`,
+      (k) => `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${k}`,
+      (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${k}`,
+      (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${k}`,
+      (k) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${k}`
+    ];
+
+    async function sendWithFallback(payload, apiKey) {
+      let lastError = null;
+
+      for (const getUrl of ENDPOINT_CANDIDATES) {
+        const url = getUrl(apiKey);
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            return await res.json();
+          }
+
+          const errJson = await res.json().catch(() => null);
+          lastError = new Error(`[${res.status}] ${errJson?.error?.message || res.statusText}`);
+          // 404인 경우 다음 모델 후보로 자동 시도
+          if (res.status !== 404) {
+            throw lastError;
+          }
+        } catch (err) {
+          lastError = err;
+          if (err.message && !err.message.includes("404")) {
+            throw err;
+          }
+        }
+      }
+      throw lastError || new Error("지원되는 Gemini 모델을 찾을 수 없습니다.");
+    }
+
     async function executeInstruction() {
       const prompt = userInputEl.value.trim();
       const apiKey = getActiveApiKey();
 
       if (!apiKey) {
-        alert("화면 맨 위의 입력창에 발급받은 Gemini API 키를 넣고 [저장]을 먼저 눌러주세요!");
+        alert("화면 맨 위의 입력창에 Gemini API 키를 넣고 [저장]을 먼저 눌러주세요!");
         return;
       }
       if (!prompt) return;
@@ -454,29 +488,16 @@
 
       try {
         const fullPrompt = `${SYSTEM_PROMPT}\n\n[현재 남은 쓰레기]: ${JSON.stringify(remainingTrash)}\n[아이의 지시문]: "${prompt}"`;
-        // 정식 모델 gemini-1.5-flash 지정
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: fullPrompt }] }]
+        };
 
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: fullPrompt }] }]
-          })
-        });
-
-        if (!res.ok) {
-          const errDetail = await res.json().catch(() => null);
-          const errorMsg = errDetail?.error?.message || `HTTP ${res.status}`;
-          throw new Error(`[오류 코드 ${res.status}] ${errorMsg}`);
-        }
-
-        const data = await res.json();
-        const rawText = data.candidates[0].content.parts[0].text;
+        const data = await sendWithFallback(payload, apiKey);
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
         const cleanJson = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
         const parsed = JSON.parse(cleanJson);
 
-        robotSpeechEl.textContent = parsed.speech;
+        robotSpeechEl.textContent = parsed.speech || "삐비빅... 분석을 완료했습니다.";
         robotAvatar.textContent = "🤖";
 
         if (parsed.sorted && Array.isArray(parsed.sorted)) {
