@@ -14,7 +14,6 @@
       --accent-green: #34d399;
       --accent-amber: #fbbf24;
       --accent-rose: #fb7185;
-      --accent-purple: #c084fc;
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --border: #243049;
@@ -40,12 +39,11 @@
       padding: 12px;
     }
 
-    /* 태블릿 가로 2분할 컨테이너 */
     .tablet-workspace {
       width: 100%;
-      max-width: 1180px;
+      max-width: 1200px;
       height: 100%;
-      max-height: 760px;
+      max-height: 780px;
       display: grid;
       grid-template-columns: 1.25fr 0.95fr;
       gap: 14px;
@@ -56,38 +54,37 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
     }
 
-    /* 좌측: 시각 연구실 (로봇, 쓰레기장, 수거함) */
+    /* 좌측 연구실 */
     .left-lab {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       height: 100%;
       overflow: hidden;
     }
 
-    /* 로봇 현장 뷰어 */
     .robot-hud {
       background: var(--panel-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 16px;
+      border-radius: 14px;
+      padding: 10px 14px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       flex-shrink: 0;
     }
 
     .robot-figure {
-      width: 64px;
-      height: 64px;
+      width: 58px;
+      height: 58px;
       background: #1e293b;
       border-radius: 50%;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 2.2rem;
+      font-size: 2rem;
       border: 2px solid var(--accent-cyan);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.25);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
       animation: hoverBob 2.5s ease-in-out infinite;
       flex-shrink: 0;
     }
@@ -102,8 +99,8 @@
       background: #172136;
       border: 1px solid #2d3b58;
       border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.88rem;
+      padding: 10px 12px;
+      font-size: 0.85rem;
       line-height: 1.45;
       color: #e2e8f0;
       position: relative;
@@ -120,13 +117,12 @@
       border-right: 8px solid #172136;
     }
 
-    /* 쓰레기 더미 시각 구역 */
     .yard-zone {
       flex: 1;
       background: #0f1523;
       border: 2px dashed #28354f;
-      border-radius: 16px;
-      padding: 12px;
+      border-radius: 14px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -136,77 +132,80 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .zone-title {
       font-size: 0.85rem;
       font-weight: 800;
       color: var(--accent-cyan);
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .zone-counter {
       background: #1e293b;
       color: #cbd5e1;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      padding: 3px 10px;
+      padding: 3px 8px;
       border-radius: 20px;
     }
 
-    /* 아이템 시각 카드 그리드 */
+    /* 25종 시각 카드 그리드 */
     .trash-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+      gap: 7px;
       overflow-y: auto;
-      padding: 4px;
-      align-content: start;
+      padding-right: 4px;
       flex: 1;
+    }
+
+    .trash-grid::-webkit-scrollbar {
+      width: 5px;
+    }
+    .trash-grid::-webkit-scrollbar-thumb {
+      background: #243049;
+      border-radius: 4px;
     }
 
     .trash-card {
       background: var(--card-bg);
-      border: 2px solid var(--border);
-      border-radius: 14px;
-      padding: 10px 6px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 7px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: all 0.25s ease;
-      cursor: default;
+      gap: 4px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
     }
 
     .trash-card:hover {
-      transform: translateY(-3px);
+      transform: translateY(-2px);
       border-color: var(--accent-cyan);
       background: var(--card-hover);
     }
 
     .trash-icon {
-      font-size: 2.2rem;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.4));
+      font-size: 1.7rem;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
     }
 
     .trash-name {
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       font-weight: 800;
       color: #f1f5f9;
       text-align: center;
       white-space: nowrap;
     }
 
-    /* 4대 분리수거함 시각 그래픽 */
+    /* 4대 분리수거함 */
     .bins-dock {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px;
       flex-shrink: 0;
       height: 125px;
     }
@@ -214,12 +213,11 @@
     .bin-tank {
       background: var(--panel-bg);
       border: 2px solid var(--border);
-      border-radius: 14px;
-      padding: 8px 6px;
+      border-radius: 12px;
+      padding: 6px 4px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
       overflow: hidden;
     }
 
@@ -229,12 +227,9 @@
     .bin-tank.glass { border-color: var(--accent-rose); }
 
     .bin-header {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 800;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .bin-tank.paper .bin-header { color: var(--accent-cyan); }
@@ -249,40 +244,40 @@
       flex-wrap: wrap;
       justify-content: center;
       align-content: flex-start;
-      gap: 4px;
+      gap: 3px;
       overflow-y: auto;
       background: rgba(0, 0, 0, 0.25);
-      border-radius: 8px;
-      padding: 4px;
+      border-radius: 6px;
+      padding: 3px;
     }
 
     .collected-pill {
       background: #1e293b;
       border: 1px solid #334155;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 6px;
+      padding: 2px 5px;
+      border-radius: 5px;
       color: #e2e8f0;
       display: flex;
       align-items: center;
-      gap: 3px;
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      gap: 2px;
+      animation: popIn 0.25s ease-out;
     }
 
     @keyframes popIn {
-      from { transform: scale(0.5); opacity: 0; }
+      from { transform: scale(0.6); opacity: 0; }
       to { transform: scale(1); opacity: 1; }
     }
 
-    /* 우측: AI 지휘 콘솔 & 직접 입력 */
+    /* 우측 콘솔 */
     .right-console {
       background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
-      padding: 14px;
+      padding: 12px;
       gap: 10px;
       height: 100%;
       overflow: hidden;
@@ -292,18 +287,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 8px;
+      padding-bottom: 6px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
 
     .console-title {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .key-toggle-btn {
@@ -317,13 +309,12 @@
       cursor: pointer;
     }
 
-    /* 모달 형태의 API 설정창 */
     .api-drawer {
       display: none;
       background: #0f172a;
       border: 1px solid var(--accent-cyan);
-      border-radius: 10px;
-      padding: 8px;
+      border-radius: 8px;
+      padding: 6px;
       gap: 6px;
     }
 
@@ -336,9 +327,9 @@
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 6px 8px;
       color: #fff;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       outline: none;
     }
 
@@ -346,24 +337,23 @@
       background: var(--accent-cyan);
       color: #090e1a;
       border: none;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-weight: 800;
       cursor: pointer;
     }
 
-    /* 대화 로그 터미널 */
     .terminal-chat {
       flex: 1;
       background: #090d16;
       border: 1px solid #1a2336;
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .chat-row {
@@ -371,19 +361,14 @@
       flex-direction: column;
       max-width: 90%;
       line-height: 1.45;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
     }
 
-    .chat-row.user {
-      align-self: flex-end;
-    }
-
-    .chat-row.robot {
-      align-self: flex-start;
-    }
+    .chat-row.user { align-self: flex-end; }
+    .chat-row.robot { align-self: flex-start; }
 
     .chat-author {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       margin-bottom: 2px;
       color: var(--text-sub);
@@ -395,7 +380,7 @@
     }
 
     .chat-bubble {
-      padding: 9px 13px;
+      padding: 8px 12px;
       border-radius: 12px;
       word-break: keep-all;
     }
@@ -413,25 +398,22 @@
       border-top-left-radius: 2px;
     }
 
-    /* 하단 키보드 직접 입력창 */
     .prompt-box {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-shrink: 0;
-      padding-top: 4px;
     }
 
     .text-input {
       flex: 1;
-      height: 48px;
+      height: 44px;
       background: #090d16;
       border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 0 14px;
+      border-radius: 10px;
+      padding: 0 12px;
       color: #fff;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     .text-input:focus {
@@ -439,63 +421,44 @@
     }
 
     .send-btn {
-      width: 76px;
-      height: 48px;
+      width: 70px;
+      height: 44px;
       background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
       color: #090e1a;
       border: none;
-      border-radius: 12px;
-      font-size: 0.95rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 900;
       cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
     }
 
     .send-btn:disabled {
       background: #334155;
       color: #64748b;
-      box-shadow: none;
       cursor: not-allowed;
-    }
-
-    @media (max-width: 850px) {
-      body { overflow-y: auto; height: auto; }
-      .tablet-workspace { grid-template-columns: 1fr; height: auto; max-height: none; }
-      .yard-zone { min-height: 220px; }
-      .right-console { height: 480px; }
     }
   </style>
 </head>
 <body>
 
   <main class="tablet-workspace">
-    <!-- 좌측: 시각 연구실 공간 -->
+    <!-- 좌측 연구실 -->
     <section class="left-lab">
-      <!-- 상단 로봇 모니터 -->
       <div class="robot-hud">
         <div class="robot-figure" id="robotAvatar">🤖</div>
         <div class="robot-dialogue" id="robotSpeech">
-          치익... 삐비빅! 쓰레기장에 여러 물건이 뒤섞여 있습니다. 저는 인간의 상식이 없어서 무엇인지 모릅니다. 실험 조건이나 구분 방법을 직접 타이핑해 명령해 주세요!
+          치익... 삐비빅! 25개의 다양한 물건이 뒤섞여 있습니다. 저는 인간의 상식이 없으니, 실험 방법과 조건을 직접 문장으로 적어 지시해 주세요!
         </div>
       </div>
 
-      <!-- 중앙 쓰레기 더미 시각 카드 구역 -->
       <div class="yard-zone">
         <div class="zone-header">
-          <div class="zone-title">
-            <span>📦 미분류 물건 현장</span>
-          </div>
-          <span class="zone-counter" id="trashCount">남은 물품: 7개</span>
+          <span class="zone-title">📦 미분류 물건 현장</span>
+          <span class="zone-counter" id="trashCount">남은 물품: 25개</span>
         </div>
-        <div class="trash-grid" id="trashGrid">
-          <!-- 사물 카드 동적 렌더링 -->
-        </div>
+        <div class="trash-grid" id="trashGrid"></div>
       </div>
 
-      <!-- 하단 4대 분리수거함 -->
       <div class="bins-dock">
         <div class="bin-tank paper">
           <div class="bin-header">📄 종이</div>
@@ -516,33 +479,30 @@
       </div>
     </section>
 
-    <!-- 우측: AI 지휘 콘솔 & 직접 텍스트 입력창 -->
+    <!-- 우측 지휘 콘솔 -->
     <section class="right-console">
       <div class="console-topbar">
         <div class="console-title">
           <span>⚡ AI 지휘 콘솔</span>
-          <span id="aiBadge" style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700;">대기 중</span>
+          <span id="aiBadge" style="font-size: 0.7rem; color: var(--accent-cyan); margin-left: 6px;">대기 중</span>
         </div>
         <button class="key-toggle-btn" id="btnToggleKey">API 키 설정</button>
       </div>
 
-      <!-- API 키 드로어 -->
       <div class="api-drawer" id="apiDrawer">
         <input type="password" id="apiKeyInput" placeholder="Gemini API 키 (AIzaSy...)">
         <button id="btnSaveKey">저장</button>
       </div>
 
-      <!-- 메신저 스타일 터미널 로그 -->
       <div class="terminal-chat" id="chatBox">
         <div class="chat-row robot">
           <span class="chat-author">🤖 로봇 알비</span>
           <div class="chat-bubble">
-            센서 준비 완료. 아이들이 내리는 명령을 글자 그대로 실행할 준비가 되었습니다!
+            센서 가동 완료. 어떤 실험을 해볼까요? (예: "물을 뿌려서 젖는 건 종이로 보내", "자석을 대보고 붙으면 철이야")
           </div>
         </div>
       </div>
 
-      <!-- 아이가 직접 타이핑하는 텍스트 입력부 -->
       <div class="prompt-box">
         <input type="text" id="userInput" class="text-input" placeholder="알비에게 내릴 실험 방법과 조건을 직접 입력하세요..." autocomplete="off">
         <button id="btnSend" class="send-btn">전송</button>
@@ -551,38 +511,68 @@
   </main>
 
   <script>
-    // 1. 사물 데이터베이스 (시각 그래픽 아이콘 매핑)
+    /* =====================================================================
+       25종 사물 카탈로그 & 물리적 속성 데이터베이스
+       ===================================================================== */
     const TRASH_CATALOG = {
-      "신문지": { icon: "📰", type: "paper" },
-      "택배 상자": { icon: "📦", type: "paper" },
-      "음료수 캔": { icon: "🥫", type: "metal" },
-      "통조림 통": { icon: "🥫", type: "metal" },
-      "페트병": { icon: "🧴", type: "plastic" },
-      "플라스틱 컵": { icon: "🥤", type: "plastic" },
-      "유리병": { icon: "🍶", type: "glass" }
+      // 1. 종이류 (7종)
+      "신문지": { icon: "📰", category: "종이" },
+      "택배 상자": { icon: "📦", category: "종이" },
+      "종이컵": { icon: "☕", category: "종이" },
+      "우유갑": { icon: "🥛", category: "종이" },
+      "전단지": { icon: "📄", category: "종이" },
+      "달력": { icon: "📅", category: "종이" },
+      "스케치북": { icon: "📒", category: "종이" },
+
+      // 2. 철/금속류 (6종)
+      "음료수 캔": { icon: "🥫", category: "철" },
+      "통조림 통": { icon: "🥫", category: "철" },
+      "쇠못": { icon: "🔩", category: "철" },
+      "클립": { icon: "📎", category: "철" },
+      "부탄가스 통": { icon: "🧯", category: "철" },
+      "쇠숟가락": { icon: "🥄", category: "철" },
+
+      // 3. 플라스틱류 (6종)
+      "페트병": { icon: "🧴", category: "플라스틱" },
+      "플라스틱 컵": { icon: "🥤", category: "플라스틱" },
+      "샴푸통": { icon: "🧴", category: "플라스틱" },
+      "플라스틱 빨대": { icon: "🧃", category: "플라스틱" },
+      "배달 용기": { icon: "🥡", category: "플라스틱" },
+      "장난감 블록": { icon: "🧱", category: "플라스틱" },
+
+      // 4. 유리류 (6종)
+      "유리병": { icon: "🍶", category: "유리" },
+      "잼 병": { icon: "🍯", category: "유리" },
+      "향수병": { icon: "🧪", category: "유리" },
+      "유리컵": { icon: "🥛", category: "유리" },
+      "소스 병": { icon: "🍾", category: "유리" },
+      "유리 반찬통": { icon: "🥣", category: "유리" }
     };
 
     let remainingTrash = Object.keys(TRASH_CATALOG);
     let sortedBins = { "종이": [], "철": [], "플라스틱": [], "유리": [] };
 
-    // 2. 알비 로봇 두뇌 프롬프트
     const SYSTEM_PROMPT = `
-당신은 인간의 상식이 전혀 없는 정밀 로봇 '알비'입니다.
-현재 쓰레기장에 있고, 아이가 키보드로 직접 타이핑한 실험 지시문을 기계적/논리적으로 실행합니다.
+당신은 인간의 상식이 전혀 없는 고철 분리수거 로봇 '알비'입니다.
+현재 쓰레기장에 있고, 아이가 키보드로 직접 타이핑한 실험 지시문을 기계적/논리적으로 분석하여 실행합니다.
 
-[사물들의 물리적 속성 팩트]
-- 신문지, 택배 상자: 불에 활활 탐, 자석에 안 붙음, 물에 젖어 가라앉음, 가벼움
-- 음료수 캔, 통조림 통: 불에 안 탐, 자석에 강하게 붙음, 물에 가라앉음, 전기가 통함
-- 페트병, 플라스틱 컵: 불에 오그라들며 녹음, 자석에 안 붙음, 물에 뜸
-- 유리병: 불에 안 탐, 자석에 안 붙음, 물에 가라앉음, 투명하고 깨지기 쉬움
+[사물 25종의 물리적 팩트]
+1. 종이류 (신문지, 택배 상자, 종이컵, 우유갑, 전단지, 달력, 스케치북):
+   - 불에 잘 탐/재가 됨, 물에 젖으면 눅눅해지거나 가라앉음, 자석에 안 붙음, 손으로 찢어짐, 가벼움
+2. 철/금속류 (음료수 캔, 통조림 통, 쇠못, 클립, 부탄가스 통, 쇠숟가락):
+   - 자석에 강하게 달라붙음, 불에 타지 않음, 전기가 통함, 물에 가라앉음, 두드리면 깡깡 쇠소리 남
+3. 플라스틱류 (페트병, 플라스틱 컵, 샴푸통, 플라스틱 빨대, 배달 용기, 장난감 블록):
+   - 불/열에 닿으면 오그라들며 녹음, 물에 대부분 뜸(밀도 낮음), 자석에 안 붙음, 충격에 깨지지 않음
+4. 유리류 (유리병, 잼 병, 향수병, 유리컵, 소스 병, 유리 반찬통):
+   - 투명하거나 반투명함, 불에 절대 안 탐, 자석에 안 붙음, 물에 가라앉음, 떨어뜨리면 쨍 하고 깨짐, 표면이 단단하고 차가움
 
 [행동 원칙]
-1. 아이가 직접 입력한 물리적 실험(자석, 불, 물, 두드리기, 무게 비교 등)과 조건문을 문자 그대로 수행합니다.
-2. "알아서 나눠", "그냥 버려" 같은 상식에 기댄 지시는 "삐비빅! 어떤 기준으로 나눠야 하는지 조건 데이터가 없습니다!"라며 거부하세요.
-3. 아이의 지시 조건에 부합하여 식별된 사물만 bin("종이", "철", "플라스틱", "유리")에 분류하세요.
-4. 반드시 순수 JSON만 출력하세요:
+1. 아이가 지시한 물리적 행동(물 뿌리기, 물에 띄우기, 자석 대기, 불 대기, 두드리기 등)과 조건문을 그대로 실행합니다.
+2. 조건에 부합하는 사물들을 찾아서 그 결과를 생생하게 설명하고, 아이가 지정한 수거함("종이", "철", "플라스틱", "유리")으로 분류하세요.
+3. 조건에 맞는 물건이 여러 개라면 한 번에 모두 분류할 수 있습니다.
+4. 반드시 순수 JSON 형식으로만 응답하세요:
 {
-  "speech": "로봇의 대사 (아이 눈높이에서 실험 과정과 결과를 생생하게 설명)",
+  "speech": "로봇의 대사 (아이 눈높이에서 실험 결과와 분류 과정을 재미있게 설명)",
   "sorted": [
     {"item": "사물이름", "bin": "종이|철|플라스틱|유리"}
   ]
@@ -603,12 +593,11 @@
     const btnSaveKeyEl = document.getElementById("btnSaveKey");
     const btnToggleKeyEl = document.getElementById("btnToggleKey");
 
-    // API 키 관리
     function getActiveKey() {
-      return (localStorage.getItem("albi_gemini_key_v4") || apiKeyInputEl.value || "").trim();
+      return (localStorage.getItem("albi_gemini_key_v5") || apiKeyInputEl.value || "").trim();
     }
 
-    const savedKey = localStorage.getItem("albi_gemini_key_v4");
+    const savedKey = localStorage.getItem("albi_gemini_key_v5");
     if (savedKey) {
       apiKeyInputEl.value = savedKey;
       aiBadgeEl.textContent = "연결 준비됨";
@@ -626,13 +615,12 @@
         alert("API 키를 입력하세요.");
         return;
       }
-      localStorage.setItem("albi_gemini_key_v4", val);
+      localStorage.setItem("albi_gemini_key_v5", val);
       apiDrawerEl.classList.remove("active");
       aiBadgeEl.textContent = "연결 준비됨";
       alert("API 키가 저장되었습니다.");
     });
 
-    // 화면 렌더링
     function renderLab() {
       trashGridEl.innerHTML = "";
       remainingTrash.forEach(item => {
@@ -670,23 +658,31 @@
       chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
     }
 
-    // 최신 Flash 모델 자동 감지 (404 방지)
+    // 최신 지원 모델 탐색 (gemini-3.8-flash 우선)
     async function getUsableModel(apiKey) {
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
         if (res.ok) {
           const data = await res.json();
           const list = data.models || [];
+          
+          // 1순위: 에러 메시지가 지목한 최신 gemini-3.8-flash
+          const m38 = list.find(m => m.name.includes("gemini-3.8-flash") && m.supportedGenerationMethods?.includes("generateContent"));
+          if (m38) return m38.name.replace(/^models\//, "");
+
+          // 2순위: 그 외 가용 가능한 flash 모델
           const flash = list.find(m => m.name.includes("flash") && m.supportedGenerationMethods?.includes("generateContent"));
-          if (flash) return flash.name;
+          if (flash) return flash.name.replace(/^models\//, "");
+
+          const any = list.find(m => m.supportedGenerationMethods?.includes("generateContent"));
+          if (any) return any.name.replace(/^models\//, "");
         }
       } catch (e) {
         console.warn(e);
       }
-      return "models/gemini-2.0-flash";
+      return "gemini-3.8-flash";
     }
 
-    // 명령 전송 처리
     btnSendEl.addEventListener("click", sendCommand);
     userInputEl.addEventListener("keypress", (e) => {
       if (e.key === "Enter") sendCommand();
@@ -698,7 +694,7 @@
 
       if (!apiKey) {
         apiDrawerEl.classList.add("active");
-        alert("우측 상단 'API 키 설정'을 열어 Gemini API 키를 먼저 저장해 주세요.");
+        alert("우측 상단 'API 키 설정'에서 키를 먼저 저장해 주세요.");
         return;
       }
       if (!prompt) return;
@@ -706,14 +702,14 @@
       addChat("🧑‍💻 나(아이)", prompt, true);
       userInputEl.value = "";
       btnSendEl.disabled = true;
-      aiBadgeEl.textContent = "실험 분석 중...";
+      aiBadgeEl.textContent = "분석 중...";
       robotAvatarEl.textContent = "⚡";
-      robotSpeechEl.textContent = "치익... 센서 가동 중! 명령을 물리적으로 시도해 봅니다...";
+      robotSpeechEl.textContent = "치익... 센서 가동! 25개 물품을 대상으로 실험을 진행합니다...";
 
       try {
         const modelName = await getUsableModel(apiKey);
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${apiKey}`;
-        const fullPrompt = `${SYSTEM_PROMPT}\n\n[현재 남은 쓰레기]: ${JSON.stringify(remainingTrash)}\n[아이의 직접 지시문]: "${prompt}"`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const fullPrompt = `${SYSTEM_PROMPT}\n\n[현재 남은 쓰레기 25종 중 잔여 목록]: ${JSON.stringify(remainingTrash)}\n[아이의 직접 지시문]: "${prompt}"`;
 
         const res = await fetch(endpoint, {
           method: "POST",
@@ -752,8 +748,8 @@
 
         if (remainingTrash.length === 0) {
           robotAvatarEl.textContent = "🎉";
-          robotSpeechEl.textContent = "대단합니다! 모든 쓰레기가 올바르게 분리수거되었습니다! 실험 성공!";
-          addChat("🎉 연구 완료", "모든 사물을 완벽하게 분리했습니다!", false);
+          robotSpeechEl.textContent = "대단합니다! 25개의 모든 물품이 올바르게 분리수거되었습니다! 실험 성공!";
+          addChat("🎉 연구 완료", "25개의 사물을 완벽하게 분류했습니다!", false);
         }
 
       } catch (err) {
