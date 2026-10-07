@@ -483,7 +483,7 @@
         <div class="chat-row robot">
           <span class="chat-author">🤖 로봇 알비</span>
           <div class="chat-bubble">
-            초고속 모드 가동 완료! 지시를 내리면 즉시 25개 물품을 테스트하여 분류합니다.
+            센서 준비 완료! 지시를 내리면 즉시 25개 물품을 테스트하여 분류합니다.
           </div>
         </div>
       </div>
@@ -529,23 +529,22 @@
 
     let remainingTrash = Object.keys(TRASH_CATALOG);
     let sortedBins = { "종이": [], "철": [], "플라스틱": [], "유리": [] };
-    let cachedModelName = null; // 모델명 1회 캐싱
 
     const SYSTEM_PROMPT = `
-당신은 인간의 상식이 전혀 없는 고철 로봇 '알비'입니다.
-현재 25개의 쓰레기가 있고, 아이의 실험 지시문을 기계적으로 실행합니다.
+당신은 인간의 상식이 없는 고철 로봇 '알비'입니다.
+현재 25개의 쓰레기가 있고, 아이의 실험 지시를 기계적으로 분석하여 실행합니다.
 
 [사물 25종의 물리적 속성]
-- 종이류(신문지, 택배 상자, 종이컵, 우유갑, 전단지, 달력, 스케치북): 불에 탐, 물에 젖음, 자석 반응 없음, 가벼움
-- 철류(음료수 캔, 통조림 통, 쇠못, 클립, 부탄가스 통, 쇠숟가락): 자석에 강하게 붙음, 불 안 탐, 전도성 있음, 물에 가라앉음
-- 플라스틱류(페트병, 플라스틱 컵, 샴푸통, 플라스틱 빨대, 배달 용기, 장난감 블록): 불에 녹아 찌그러짐, 물에 뜸, 자석 반응 없음
-- 유리류(유리병, 잼 병, 향수병, 유리컵, 소스 병, 유리 반찬통): 투명함, 불 안 탐, 자석 반응 없음, 물에 가라앉음, 깨지기 쉬움
+- 종이류(신문지, 택배 상자, 종이컵, 우유갑, 전단지, 달력, 스케치북): 물에 젖음/가라앉음, 불에 탐, 자석 반응 없음, 가벼움
+- 철류(음료수 캔, 통조림 통, 쇠못, 클립, 부탄가스 통, 쇠숟가락): 자석에 강하게 붙음, 물에 가라앉음, 불 안 탐, 전도성 있음
+- 플라스틱류(페트병, 플라스틱 컵, 샴푸통, 플라스틱 빨대, 배달 용기, 장난감 블록): 물에 뜸, 열/불에 녹아 오그라듦, 자석 반응 없음
+- 유리류(유리병, 잼 병, 향수병, 유리컵, 소스 병, 유리 반찬통): 투명함, 물에 가라앉음, 자석 반응 없음, 충격에 깨짐
 
-[원칙]
-1. 아이의 지시(물, 자석, 불 등)에 부합하는 사물을 판별하고 대사를 작성하세요.
-2. 반드시 JSON만 출력하세요.
+[행동 지침]
+1. 아이의 지시(물 뿌리기, 물에 띄우기, 자석 대기, 불 대기 등)에 부합하는 사물을 판별하세요.
+2. 반드시 아래 JSON 형식으로만 응답하세요:
 {
-  "speech": "결과 설명 대사",
+  "speech": "결과 설명 대사 (아이 눈높이 구어체로 1~2문장)",
   "sorted": [{"item": "사물이름", "bin": "종이|철|플라스틱|유리"}]
 }
 `;
@@ -564,10 +563,10 @@
     const btnToggleKeyEl = document.getElementById("btnToggleKey");
 
     function getActiveKey() {
-      return (localStorage.getItem("albi_gemini_key_v6") || apiKeyInputEl.value || "").trim();
+      return (localStorage.getItem("albi_gemini_key_v7") || apiKeyInputEl.value || "").trim();
     }
 
-    const savedKey = localStorage.getItem("albi_gemini_key_v6");
+    const savedKey = localStorage.getItem("albi_gemini_key_v7");
     if (savedKey) {
       apiKeyInputEl.value = savedKey;
       aiBadgeEl.textContent = "연결 준비됨";
@@ -580,8 +579,8 @@
     btnSaveKeyEl.addEventListener("click", () => {
       const val = apiKeyInputEl.value.trim();
       if (!val) { alert("API 키를 입력하세요."); return; }
-      localStorage.setItem("albi_gemini_key_v6", val);
-      cachedModelName = null; // 키 변경 시 모델 재탐색
+      localStorage.setItem("albi_gemini_key_v7", val);
+      localStorage.removeItem("albi_fast_model_v7");
       apiDrawerEl.classList.remove("active");
       aiBadgeEl.textContent = "연결 준비됨";
       alert("API 키가 저장되었습니다.");
@@ -618,25 +617,44 @@
       chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
     }
 
-    // 1회 탐색 후 캐시하여 초고속 호출
+    // 초고속 Flash 모델 우선 자동 선별
     async function resolveFastModel(apiKey) {
-      if (cachedModelName) return cachedModelName;
+      const cached = localStorage.getItem("albi_fast_model_v7");
+      if (cached) return cached;
+
       try {
         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
         if (res.ok) {
           const data = await res.json();
-          const list = data.models || [];
-          const m38 = list.find(m => m.name.includes("gemini-3.8-flash") && m.supportedGenerationMethods?.includes("generateContent"));
-          if (m38) { cachedModelName = m38.name.replace(/^models\//, ""); return cachedModelName; }
+          const list = (data.models || []).map(m => m.name.replace(/^models\//, ""));
 
-          const flash = list.find(m => m.name.includes("flash") && m.supportedGenerationMethods?.includes("generateContent"));
-          if (flash) { cachedModelName = flash.name.replace(/^models\//, ""); return cachedModelName; }
+          // 응답 속도가 빠른 모델 우선순위
+          const fastCandidates = [
+            "gemini-2.0-flash",
+            "gemini-2.0-flash-lite",
+            "gemini-1.5-flash",
+            "gemini-1.5-flash-latest",
+            "gemini-3.8-flash",
+            "gemini-3-flash-preview"
+          ];
+
+          for (const cand of fastCandidates) {
+            if (list.includes(cand)) {
+              localStorage.setItem("albi_fast_model_v7", cand);
+              return cand;
+            }
+          }
+
+          const anyFlash = list.find(m => m.includes("flash"));
+          if (anyFlash) {
+            localStorage.setItem("albi_fast_model_v7", anyFlash);
+            return anyFlash;
+          }
         }
       } catch (e) {
         console.warn(e);
       }
-      cachedModelName = "gemini-3.8-flash";
-      return cachedModelName;
+      return "gemini-2.0-flash";
     }
 
     btnSendEl.addEventListener("click", sendCommand);
@@ -656,48 +674,45 @@
       addChat("🧑‍💻 나(아이)", prompt, true);
       userInputEl.value = "";
       btnSendEl.disabled = true;
-      aiBadgeEl.textContent = "테스트 실행 중...";
-      robotAvatarEl.textContent = "⚡";
-      robotSpeechEl.textContent = "치익... 센서 가동! 25개 물품을 즉시 분석합니다...";
 
-      // 15초 타임아웃 컨트롤러
+      // 60초 넉넉한 타임아웃 & 실시간 카운트
+      let elapsedSec = 0;
+      aiBadgeEl.textContent = "실험 중 (0초)";
+      robotAvatarEl.textContent = "⚡";
+      robotSpeechEl.textContent = "치익... 센서 가동! 물품들을 실험 중입니다... (0초)";
+
+      const counterTimer = setInterval(() => {
+        elapsedSec++;
+        aiBadgeEl.textContent = `실험 중 (${elapsedSec}초)`;
+        robotSpeechEl.textContent = `치익... 물품 25종에 명령을 테스트 중입니다... (${elapsedSec}초)`;
+      }, 1000);
+
       const controller = new AbortController();
-      const timeoutTimer = setTimeout(() => controller.abort(), 15000);
+      const abortTimer = setTimeout(() => controller.abort(), 60000); // 60초 타임아웃
 
       try {
         const modelName = await resolveFastModel(apiKey);
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
         const fullPrompt = `${SYSTEM_PROMPT}\n\n[남은 물품]: ${JSON.stringify(remainingTrash)}\n[아이의 지시문]: "${prompt}"`;
 
-        // 초고속 모드: thinkingBudget=0 (추론 대기 시간 제거), responseMimeType=JSON
         const requestBody = {
           contents: [{ parts: [{ text: fullPrompt }] }],
           generationConfig: {
             responseMimeType: "application/json",
             temperature: 0.1,
-            thinkingConfig: { thinkingBudget: 0 }
+            maxOutputTokens: 500
           }
         };
 
-        let res = await fetch(endpoint, {
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody),
           signal: controller.signal
         });
 
-        // thinkingConfig 미지원 모델 대비 폴백
-        if (!res.ok && res.status === 400) {
-          delete requestBody.generationConfig.thinkingConfig;
-          res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(requestBody),
-            signal: controller.signal
-          });
-        }
-
-        clearTimeout(timeoutTimer);
+        clearTimeout(abortTimer);
+        clearInterval(counterTimer);
 
         if (!res.ok) {
           const err = await res.json().catch(() => null);
@@ -733,10 +748,11 @@
         }
 
       } catch (err) {
-        clearTimeout(timeoutTimer);
+        clearTimeout(abortTimer);
+        clearInterval(counterTimer);
         console.error(err);
         robotAvatarEl.textContent = "⚠️";
-        const errMsg = (err.name === "AbortError") ? "응답 시간이 초과되었습니다. 다시 전송해 주세요." : err.message;
+        const errMsg = (err.name === "AbortError") ? "60초 동안 응답이 없어 취소되었습니다. 다시 시도해 주세요." : err.message;
         robotSpeechEl.textContent = `삐비빅... 상태: ${errMsg}`;
         addChat("⚠️ 안내", errMsg, false);
       } finally {
